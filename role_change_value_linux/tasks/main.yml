@@ -1,0 +1,62 @@
+---
+# tasks file for role_change_value_linux
+- name: "Reading user information"
+  read_csv:
+    path: test.csv
+    key: server_name
+  register: servers
+- name: "Values to variable"
+  debug:
+    msg: "{{ item.value.server_name }}"
+
+  loop: "{{ servers.dict|dict2items }}"
+
+- name: Create inventory file
+  lineinfile:
+    line: "[all_servers]"
+    path: /tmp/inventory.ini
+    create: yes 
+
+- name: Inserting values to inventory file
+  lineinfile:
+    line: "{{ item.value.server_name }}   packages={{ item.value.packages }}  reboot_required={{ item.value.reboot_required }}"
+    path: /tmp/inventory.ini
+  loop: "{{ servers.dict|dict2items }}"
+
+
+- name: uploading the script to repo
+  shell: |
+    git clone "{{ git_repo }}"
+    cp /tmp/inventory.ini /tmp/{{ repo_name }}
+  args:
+    chdir: /tmp
+  register: cmd_out
+  ignore_errors: yes
+
+- debug: var=cmd_out
+  
+- name: Check whether directory cloned
+  stat:
+    path: /tmp/{{ repo_name }}
+  register: path_value
+
+- debug: var=path_value  
+
+- name: adding the file to repo
+  shell: |
+    git add inventory.ini
+    git commit -m "inventory added"
+    git push -u origin master
+  args:
+    chdir: /tmp/{{ repo_name }}
+  ignore_errors: yes
+#  register: result
+
+- name: deleting the directory
+  shell: rm -rf /tmp/{{ repo_name }}
+
+- name: deleting the inventory file
+  file:
+    path: /tmp/inventory.ini
+    state: absent
+

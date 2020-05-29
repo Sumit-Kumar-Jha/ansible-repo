@@ -1,0 +1,5 @@
+---
+- name: Deploying inventory
+  hosts: localhost
+  roles:
+    - role_change_value_linux

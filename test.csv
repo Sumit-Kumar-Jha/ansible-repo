@@ -1,0 +1,3 @@
+server_name,packages,reboot_required
+localhost,http,no
+192.169.90.99,ngnix,yes

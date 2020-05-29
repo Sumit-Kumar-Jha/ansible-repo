@@ -1,0 +1,4 @@
+---
+# vars file for role_change_value_linux
+git_repo: "https://Sumit-Kumar-Jha:Centralbankofindia%40123@github.com/Sumit-Kumar-Jha/ansible-repo.git"
+repo_name: ansible-repo
